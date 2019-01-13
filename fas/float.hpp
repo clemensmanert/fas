@@ -250,6 +250,79 @@ public:
 	constexpr auto operator!=(const Tvalue &other) const noexcept {
 		return *this != self_t(other);
 	}
+
+	//! Returns whether `this` is smaller than the given operand.
+	//!
+	//! @param other The value to compare. Both, `this` and `other` need to be
+	//!              normalized.
+	constexpr auto operator<(const self_t &other) const noexcept {
+		if (*this == ZERO()) {
+			return other._mantissa > 0;
+		}
+
+		if (other == ZERO()) {
+			return _mantissa < 0;
+		}
+
+		if (_exponent != other._exponent) {
+			return _exponent < other._exponent;
+		}
+
+		return _mantissa < other._mantissa;
+	}
+
+	//! Returns whether `this` is smaller than the given operand.
+	//!
+	//! @param other The value `this` is compared to.
+	template <typename Tvalue>
+	constexpr auto operator<(const Tvalue &other) const noexcept {
+		return *this < self_t(other);
+	}
+
+	//! Returns whether `this` is larger than the given operand.
+	//!
+	//! @param other The value `this` is compared to.
+	constexpr auto operator>(const self_t &other) const noexcept {
+		return (!(*this < other)) && *this != other;
+	}
+
+	//! Returns whether `this` is larger than the given operand.
+	//!
+	//! @param other The value `this` is compared to.
+	template <typename Tvalue>
+	constexpr auto operator>(const Tvalue &other) const noexcept {
+		return *this > self_t(other);
+	}
+
+	//! Returns whether `this` is smaller or equals than the given operand.
+	//!
+	//! @param other The value `this` is compared to.
+	constexpr auto operator<=(const self_t &other) const noexcept {
+		return *this < other || *this == other;
+	}
+
+	//! Returns whether `this` is smaller or equals than the given operand.
+	//!
+	//! @param other The value `this` is compared to.
+	template <typename Tvalue>
+	constexpr auto operator<=(const Tvalue &other) const noexcept {
+		return *this <= self_t(other);
+	}
+
+	//! Returns whether `this` is larger or equals than the given operand.
+	//!
+	//! @param other The value `this` is compared to.
+	constexpr auto operator>=(const self_t &other) const noexcept {
+		return !(*this < other);
+	}
+
+	//! Returns whether `this` is larger or equals than the given operand.
+	//!
+	//! @param other The value `this` is compared to.
+	template <typename Tvalue>
+	constexpr auto operator>=(const Tvalue &other) const noexcept {
+		return *this >= self_t(other);
+	}
 };
 } // namespace fas
 
