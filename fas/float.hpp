@@ -323,6 +323,23 @@ public:
 	constexpr auto operator>=(const Tvalue &other) const noexcept {
 		return *this >= self_t(other);
 	}
+
+	//! Returns this converted to the expected type Tvalue.
+	//!
+	//! @tparam Tvalue The type of the return value.
+	template <typename Tvalue>
+	constexpr explicit operator Tvalue() const noexcept {
+		Tvalue result = static_cast<Tvalue>(_mantissa);
+		for (Texponent i = 0; i < _exponent; ++i) {
+			result *= BASE;
+		}
+
+		for (Texponent i = 0; i > _exponent; --i) {
+			result /= BASE;
+		}
+
+		return result;
+	}
 };
 } // namespace fas
 
