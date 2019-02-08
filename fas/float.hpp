@@ -340,6 +340,9 @@ public:
 
 		return result;
 	}
+
+	//! Returns the operand.
+	constexpr self_t operator+() const noexcept { return *this; }
 };
 } // namespace fas
 

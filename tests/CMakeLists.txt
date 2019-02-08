@@ -24,6 +24,7 @@ set(TEST_SOURCES
 	"${CMAKE_CURRENT_LIST_DIR}/equality.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/comparison.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/conversion.cpp"
+	"${CMAKE_CURRENT_LIST_DIR}/unary_plus.cpp"
 	)
 
 set(TESTS_CMD tests)
