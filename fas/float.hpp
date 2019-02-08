@@ -343,6 +343,19 @@ public:
 
 	//! Returns the operand.
 	constexpr self_t operator+() const noexcept { return *this; }
+
+	//! Returns the negated operand.
+	constexpr self_t operator-() const noexcept {
+		if (*this == INF()) {
+			return NEGATIVE_INF();
+		}
+
+		if (*this == NEGATIVE_INF()) {
+			return INF();
+		}
+
+		return self_t(-_mantissa, _exponent);
+	}
 };
 } // namespace fas
 
