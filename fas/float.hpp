@@ -198,6 +198,15 @@ public:
 		}
 	}
 
+	//! Conversion constructor.
+	//!
+	//! @param value Not normalized mantissa value.
+	//!              Caution: This constructor works only if
+	//!              - `MANTISSA_MAX < DBL_MAX` and
+	//!              - `MANTISSA_LOWEST > (-DBL_MAX)`
+	//! @tparam Tvalue The value's type.
+	explicit constexpr Float(double value) { normalize(value); }
+
 	//! Default copy assignment operator.
 	Float &operator=(const Float &) = default;
 

@@ -20,6 +20,7 @@ set(TEST_SOURCES
 	"${CMAKE_CURRENT_LIST_DIR}/traits.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/numeric_limits.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/constructors.cpp"
+	"${CMAKE_CURRENT_LIST_DIR}/constructor_double_conversion.cpp"
 	)
 
 set(TESTS_CMD tests)
