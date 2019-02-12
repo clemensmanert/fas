@@ -40,6 +40,77 @@ class Float {
 	//! Specifies the exponent.
 	Texponent _exponent = 0;
 
+	//! Adjusts mantissa (and exponent) to show the maximum of trailing digits.
+	//! The function is different from ieee implementation, where a one is
+	//! considered in front of the mantissa.
+	//! In contrast here the mantissa gets multiplied/divided with/by BASE  until
+	//! the highest bit is one, except the bit indicating the sign.
+	//! This allows to encode special states like NAN, INF and ZERO with
+	//! _mantissa = 0 and the exponent indicating the special value.
+	//! If the mantissa were always considered to have a leading 1, it would be
+	//! necessary to use one value of the exponent to encode these states.
+	//! The ieee definition says that this is the very lowest value, but here also
+	//! unsigned exponents are allowed, which would make thinks more complicated.
+	//!
+	//! @param value The value to normalize.
+	//!          Caution: If value overflows while it is < MANTISSA_MAX or
+	//!          underflows while it is > MANTISSA_LOWEST,
+	//!          this function does not return and results in an endless loop.
+	//! @tparam value The value's type to normalize.
+	template <typename Tvalue> constexpr void normalize(Tvalue value) noexcept {
+		// Zero has a specific code.
+		if (value == 0) {
+			*this = ZERO();
+			return;
+		}
+
+		// Make a positive mantissa as large as possible,
+		// and a negative mantissa as small as possible.
+		if (value > 0) {
+			// Grows mantissa as needed.
+			while (value <= MANTISSA_MAX / BASE) {
+				if (_exponent == EXPONENT_LOWEST) {
+					*this = ZERO();
+					return;
+				}
+				--_exponent;
+				value *= BASE;
+			}
+
+			// Shrinks mantissa as needed.
+			while (value > MANTISSA_MAX) {
+				if (_exponent == EXPONENT_MAX) {
+					*this = INF();
+					return;
+				}
+				++_exponent;
+				value /= BASE;
+			}
+		} else {
+			// Grows mantissa as needed.
+			while (value >= MANTISSA_LOWEST / BASE) {
+				if (_exponent == EXPONENT_LOWEST) {
+					*this = ZERO();
+					return;
+				}
+				--_exponent;
+				value *= BASE;
+			}
+
+			// Shrinks mantissa as needed.
+			while (value < MANTISSA_LOWEST) {
+				if (_exponent == EXPONENT_MAX) {
+					*this = NEGATIVE_INF();
+					return;
+				}
+				++_exponent;
+				value /= BASE;
+			}
+		}
+
+		_mantissa = static_cast<Tmantissa>(value);
+	}
+
 	//! Creates an instance using the given values, without normalising it.
 	//!
 	//! @param mantissa The value for the mantissa.
@@ -86,6 +157,52 @@ public:
 
 	//! @returns The value's exponent.
 	constexpr Texponent exponent() const noexcept { return _exponent; }
+
+	//! Default constructor.
+	Float() = default;
+
+	//! Default copy constructor.
+	Float(const Float &) = default;
+
+	// Default move constructor.
+	Float(Float &&) = default;
+
+	//! Conversion constructor. This version supports only integer like types.
+	//! This constructor will result in `INF` or `NEGATIVE_INF` if the provided
+	//! values result in an exponent larger than `EXPONENT_MAX`.
+	//!
+	//! @param value Not normalized mantissa value.
+	//! @param exponent The values exponent.
+	//! @tparam Tvalue The value's type.
+	//! @tparam TvalueExponent The exponent's type.
+	template <typename Tvalue, typename TvalueExponent>
+	explicit constexpr Float(const Tvalue value,
+	                         const TvalueExponent exponent) noexcept {
+		if (exponent > EXPONENT_MAX) {
+			*this = INF();
+		} else if (exponent < EXPONENT_LOWEST) {
+			*this = NEGATIVE_INF();
+		} else {
+			_exponent = exponent;
+
+			// The function normalize operates on its parameter.
+			// If the max(value) is smaller than max(_mantissa), value will overflow.
+			// Same with min values.
+			// In this case normalize operates on _mantissa.
+			if (value < MANTISSA_MAX && value > MANTISSA_LOWEST) {
+				_mantissa = static_cast<Tmantissa>(value);
+				normalize(_mantissa);
+			} else {
+				normalize(value);
+			}
+		}
+	}
+
+	//! Default copy assignment operator.
+	Float &operator=(const Float &) = default;
+
+	//! Default move assignment operator.
+	Float &operator=(Float &&) = default;
 };
 } // namespace fas
 
