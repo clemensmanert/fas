@@ -40,6 +40,23 @@ class Float {
 	//! Specifies the exponent.
 	Texponent _exponent = 0;
 
+	//! A naive implementation of the binary log function for integer values.
+	//!
+	//! @param target The target to calculate the binary log.
+	//! @returns The log of target always rounded up.
+	constexpr static Tmantissa logb(Tmantissa target) {
+		Tmantissa result = 0;
+		if (target % 2) {
+			++result;
+		}
+
+		while (target > 1) {
+			target /= 2;
+			++result;
+		}
+
+		return result;
+	}
 	//! Calculates target * BASE ^ (-1*n)
 	constexpr static inline Tmantissa
 	power_negative(Tmantissa target, const Texponent &n) noexcept {
@@ -675,6 +692,81 @@ public:
 	//! @param other The operand to multiply.
 	template <typename Tvalue> self_t &operator*=(const Tvalue &factor) noexcept {
 		return (*this = *this * factor);
+	}
+
+	//! Returns the quotient of this and the given divisor.
+	//!
+	//! @param divisor The divisor to use.
+	constexpr self_t operator/(const self_t &divisor) const noexcept {
+		if (*this == ZERO()) {
+			return *this;
+		}
+
+		if (divisor == ONE()) {
+			return *this;
+		}
+
+		if (divisor == -ONE()) {
+			return -(*this);
+		}
+
+		auto mantissa_this = _mantissa;
+		auto mantissa_divisor = divisor._mantissa;
+
+		auto exponent_this = _exponent;
+		auto exponent_divisor = divisor._exponent;
+
+		while (mantissa_divisor % BASE == 0) {
+			mantissa_divisor /= BASE;
+			++exponent_divisor;
+		}
+
+		// Prevents overflow.
+		if (*this == -ONE()) {
+			mantissa_this /= BASE;
+			++exponent_this;
+		}
+
+		// Precision does not get lost, if divisor is 1 or -1
+		if (mantissa_divisor == 1 || mantissa_divisor == -1) {
+			return self_t((Tmantissa)(mantissa_this / mantissa_divisor),
+			              exponent_this - exponent_divisor);
+		}
+
+		// Integer division loses the digits < 1, so we need to store them
+		auto result_sign = 1;
+		if (mantissa_divisor < 0) {
+			result_sign = -1;
+			mantissa_divisor *= -1;
+		}
+
+		auto remainer = _mantissa % mantissa_divisor;
+		while (remainer != 0 && MANTISSA_MAX / 2 > remainer) {
+			remainer *= 2;
+		}
+
+		remainer /= mantissa_divisor;
+		return (self_t((Tmantissa)(mantissa_this / mantissa_divisor),
+		               exponent_this - exponent_divisor) +
+		        self_t(remainer,
+		               exponent_this - exponent_divisor - logb(remainer) - 1)) *
+		       result_sign;
+	}
+
+	//! Returns the quotient of this and the given divisor.
+	//!
+	//! @param divisor The divisor to use.
+	template <typename Tvalue>
+	constexpr self_t operator/(const Tvalue &divisor) const noexcept {
+		return *this / self_t(divisor);
+	}
+
+	//! Returns the quotient of this and the given divisor.
+	//!
+	//! @param divisor The divisor to use.
+	template <typename Tvalue>
+	self_t &operator/=(const Tvalue &divisor) noexcept {
+		return (*this = *this / divisor);
 	}
 };
 } // namespace fas
