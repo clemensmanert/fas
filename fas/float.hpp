@@ -143,9 +143,9 @@ class Float {
 	//! @param first The first mantissa to adjust.
 	//! @param second The second mantissa to adjust.
 	//! @param exponent_offset The offset to add to the adjusted exponent.
-	constexpr auto adjust_mantissas(const self_t &first, const self_t &second,
-	                                const int exponent_offset = 0) const
-	    noexcept {
+	constexpr auto
+	adjust_mantissas(const self_t &first, const self_t &second,
+	                 const int exponent_offset = 0) const noexcept {
 
 		if (first._exponent > second._exponent) {
 			return adjusted_result(
@@ -552,6 +552,138 @@ public:
 	template <typename Tvalue>
 	self_t &operator-=(const Tvalue &subtrahend) noexcept {
 		return (*this = *this - subtrahend);
+	}
+
+	//! Returns the product of `this` and the given operand.
+	//!
+	//! @param other The operand to multiply.
+	constexpr self_t operator*(const self_t &factor) const noexcept {
+		if (*this == ZERO()) {
+			return *this;
+		}
+
+		if (factor == ZERO()) {
+			return factor;
+		}
+
+		// multiplication function does not work
+		// if one factor is `1` or `-1`
+		if (factor == ONE()) {
+			return *this;
+		}
+
+		if (factor == -ONE()) {
+			return -(*this);
+		}
+
+		if (*this == ONE()) {
+			return factor;
+		}
+
+		if (*this == -ONE()) {
+			return -factor;
+		}
+
+		auto mantissa_this = _mantissa;
+		auto mantissa_factor = factor._mantissa;
+
+		auto exponent_this = _exponent;
+		auto exponent_factor = factor._exponent;
+
+		Tmantissa remainer_this = 0;
+		Tmantissa remainer_factor = 0;
+
+		Tmantissa base_this = 1;
+		Tmantissa base_factor = 1;
+
+		// Case 1: Both factors are positive.
+		if (_mantissa > 0 && factor._mantissa > 0) {
+			while (MANTISSA_MAX / mantissa_this < mantissa_factor) {
+				if (exponent_this < exponent_factor) {
+					remainer_this += (mantissa_this % BASE) * base_this;
+					base_this *= BASE;
+					mantissa_this /= BASE;
+					++exponent_this;
+				} else {
+					remainer_factor += (mantissa_factor % BASE) * base_factor;
+					base_factor *= BASE;
+					mantissa_factor /= BASE;
+					++exponent_factor;
+				}
+			}
+		}
+		// Case 2: Both factors are negative.
+		else if (_mantissa < 0 && factor._mantissa < 0) {
+			while (MANTISSA_MAX / mantissa_this > mantissa_factor) {
+				if (exponent_this < exponent_factor) {
+					remainer_this += (mantissa_this % BASE) * base_this;
+					base_this *= BASE;
+					mantissa_this /= BASE;
+					++exponent_this;
+				} else {
+					remainer_factor += (mantissa_factor % BASE) * base_factor;
+					base_factor *= BASE;
+					mantissa_factor /= BASE;
+					++exponent_factor;
+				}
+			}
+		}
+		// Case 3: One factor is negative.
+		else {
+			if (mantissa_this < 0) {
+				while (MANTISSA_MAX / mantissa_factor < -mantissa_this) {
+					if (exponent_this < exponent_factor) {
+						remainer_this += (mantissa_this % BASE) * base_this;
+						base_this *= BASE;
+						mantissa_this /= BASE;
+						++exponent_this;
+					} else {
+						remainer_factor += (mantissa_factor % BASE) * base_factor;
+						base_factor *= BASE;
+						mantissa_factor /= BASE;
+						++exponent_factor;
+					}
+				}
+			} else {
+				while (MANTISSA_MAX / mantissa_this < -mantissa_factor) {
+					if (exponent_this < exponent_factor) {
+						remainer_this += (mantissa_this % BASE) * base_this;
+						base_this *= BASE;
+						mantissa_this /= BASE;
+						++exponent_this;
+					} else {
+						remainer_factor += (mantissa_factor % BASE) * base_factor;
+						base_factor *= BASE;
+						mantissa_factor /= BASE;
+						++exponent_factor;
+					}
+				}
+			}
+		}
+
+		return self_t(mantissa_this * mantissa_factor,
+		              exponent_this + exponent_factor) +
+		       self_t(mantissa_this * remainer_factor,
+		              exponent_this + factor._exponent) +
+		       self_t(mantissa_factor * remainer_this,
+		              exponent_factor + factor._exponent) +
+		       self_t(remainer_factor * remainer_this,
+		              _exponent + factor._exponent);
+	}
+
+	//! Returns the product of `this` and the given operand.
+	//!
+	//! @param other The operand to multiply.
+	template <typename Tvalue>
+	constexpr self_t operator*(const Tvalue &factor) const noexcept {
+		return *this * self_t(factor);
+	}
+
+	//! Returns the product of `this` and the given operand.
+	//!
+	//! @param other The operand to multiply.
+	template <typename Tvalue> self_t &operator*=(const Tvalue &factor) noexcept {
+		return (*this = *this * factor);
 	}
 };
 } // namespace fas
