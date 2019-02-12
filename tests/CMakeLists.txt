@@ -28,6 +28,7 @@ set(TEST_SOURCES
 	"${CMAKE_CURRENT_LIST_DIR}/unary_minus.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/addition.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/substraction.cpp"
+	"${CMAKE_CURRENT_LIST_DIR}/multiplication.cpp"
 	)
 
 set(TESTS_CMD tests)
