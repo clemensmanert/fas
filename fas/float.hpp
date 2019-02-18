@@ -3,6 +3,7 @@
 #define FLOATING_POINT_HPP
 
 #include <limits>
+#include <type_traits>
 
 namespace fas {
 
@@ -87,4 +88,41 @@ public:
 	constexpr Texponent exponent() const noexcept { return _exponent; }
 };
 } // namespace fas
+
+namespace std {
+// Type traits -----------------------------------------------------------------
+template <typename... args>
+struct is_fundamental<fas::Float<args...>>
+    : std::integral_constant<bool, true> {};
+
+template <typename Tmantissa, typename Texponent, Tmantissa BASE,
+          Tmantissa MANTISSA_LOWEST, Tmantissa MANTISSA_MAX,
+          Texponent EXPONENT_LOWEST, Texponent EXPONENT_MAX>
+
+struct is_floating_point<
+    fas::Float<Tmantissa, Texponent, BASE, MANTISSA_LOWEST, MANTISSA_MAX,
+               EXPONENT_LOWEST, EXPONENT_MAX>>
+    : std::integral_constant<bool, true> {};
+
+template <typename Tmantissa, typename Texponent, Tmantissa BASE,
+          Tmantissa MANTISSA_LOWEST, Tmantissa MANTISSA_MAX,
+          Texponent EXPONENT_LOWEST, Texponent EXPONENT_MAX>
+struct is_arithmetic<fas::Float<Tmantissa, Texponent, BASE, MANTISSA_LOWEST,
+                                MANTISSA_MAX, EXPONENT_LOWEST, EXPONENT_MAX>>
+    : std::integral_constant<bool, true> {};
+
+template <typename Tmantissa, typename Texponent, Tmantissa BASE,
+          Tmantissa MANTISSA_LOWEST, Tmantissa MANTISSA_MAX,
+          Texponent EXPONENT_LOWEST, Texponent EXPONENT_MAX>
+struct is_scalar<fas::Float<Tmantissa, Texponent, BASE, MANTISSA_LOWEST,
+                            MANTISSA_MAX, EXPONENT_LOWEST, EXPONENT_MAX>>
+    : std::integral_constant<bool, true> {};
+
+template <typename Tmantissa, typename Texponent, Tmantissa BASE,
+          Tmantissa MANTISSA_LOWEST, Tmantissa MANTISSA_MAX,
+          Texponent EXPONENT_LOWEST, Texponent EXPONENT_MAX>
+struct is_object<fas::Float<Tmantissa, Texponent, BASE, MANTISSA_LOWEST,
+                            MANTISSA_MAX, EXPONENT_LOWEST, EXPONENT_MAX>>
+    : std::integral_constant<bool, true> {};
+} // namespace std
 #endif // FLOATING_POINT_HPP
