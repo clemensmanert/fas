@@ -18,6 +18,7 @@ set(TEST_SOURCES
 	"${CMAKE_CURRENT_LIST_DIR}/main_test.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/constants.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/traits.cpp"
+	"${CMAKE_CURRENT_LIST_DIR}/numeric_limits.cpp"
 	)
 
 set(TESTS_CMD tests)

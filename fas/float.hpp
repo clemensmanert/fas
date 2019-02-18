@@ -124,5 +124,23 @@ template <typename Tmantissa, typename Texponent, Tmantissa BASE,
 struct is_object<fas::Float<Tmantissa, Texponent, BASE, MANTISSA_LOWEST,
                             MANTISSA_MAX, EXPONENT_LOWEST, EXPONENT_MAX>>
     : std::integral_constant<bool, true> {};
+
+//! Numeric limits -------------------------------------------------------------
+template <typename Tmantissa, typename Texponent, Tmantissa BASE,
+          Tmantissa MANTISSA_LOWEST, Tmantissa MANTISSA_MAX,
+          Texponent EXPONENT_LOWEST, Texponent EXPONENT_MAX>
+struct numeric_limits<fas::Float<Tmantissa, Texponent, BASE, MANTISSA_LOWEST,
+                                 MANTISSA_MAX, EXPONENT_LOWEST, EXPONENT_MAX>> {
+	using Ttarget = fas::Float<Tmantissa, Texponent, BASE, MANTISSA_LOWEST,
+	                           MANTISSA_MAX, EXPONENT_LOWEST, EXPONENT_MAX>;
+	//! @returns The type's largest value.
+	static const Ttarget max() noexcept { return Ttarget::MAX(); }
+
+	//! @returns The type's smallest positive value.
+	static const Ttarget min() noexcept { return Ttarget::MIN(); }
+
+	//! @returns The type's smallest value.
+	static const Ttarget lowest() noexcept { return Ttarget::LOWEST(); }
+};
 } // namespace std
 #endif // FLOATING_POINT_HPP
