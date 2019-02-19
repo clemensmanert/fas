@@ -768,6 +768,16 @@ public:
 	self_t &operator/=(const Tvalue &divisor) noexcept {
 		return (*this = *this / divisor);
 	}
+
+	//! Returns the incremented value.
+	self_t &operator++() noexcept { return (*this += ONE()); }
+
+	//! Increments the value and returns the previous one.
+	self_t operator++(int) noexcept {
+		self_t result(*this);
+		*this += ONE();
+		return result;
+	}
 };
 } // namespace fas
 
