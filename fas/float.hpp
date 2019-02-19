@@ -778,6 +778,16 @@ public:
 		*this += ONE();
 		return result;
 	}
+
+	//! Returns the decremented value.
+	self_t &operator--() noexcept { return (*this -= ONE()); }
+
+	//! Decrements the value and returns the previous one.
+	self_t operator--(int) noexcept {
+		self_t result(*this);
+		*this -= ONE();
+		return result;
+	}
 };
 } // namespace fas
 

@@ -31,6 +31,7 @@ set(TEST_SOURCES
 	"${CMAKE_CURRENT_LIST_DIR}/multiplication.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/division.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/increment.cpp"
+	"${CMAKE_CURRENT_LIST_DIR}/decrement.cpp"
 	)
 
 set(TESTS_CMD tests)
