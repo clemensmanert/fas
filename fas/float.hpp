@@ -212,6 +212,44 @@ public:
 
 	//! Default move assignment operator.
 	Float &operator=(Float &&) = default;
+
+	//! Returns whether the given operand is considered same to this.
+	//!
+	//! @param other The value to compare. Both, `this` and `other` need to be
+	//!              normalized.
+	constexpr auto operator==(const self_t &other) const noexcept {
+		if (this == &other) {
+			return true;
+		}
+
+		return _mantissa == other._mantissa && _exponent == other._exponent;
+	}
+
+	//! Returns whether the given operand is considered same to this.
+	//!
+	//! @param other The value to compare. Both, `this` and `other` need to be
+	//!              normalized.
+	template <typename Tvalue>
+	constexpr auto operator==(const Tvalue &other) const noexcept {
+		return *this == self_t(other);
+	}
+
+	//! Returns whether the given operand is considered different from this.
+	//!
+	//! @param other The value to compare. Both, `this` and `other` need to be
+	//!              normalized.
+	constexpr auto operator!=(const self_t &other) const noexcept {
+		return !(*this == other);
+	}
+
+	//! Returns whether the given operand is considered different from this.
+	//!
+	//! @param other The value to compare. Both, `this` and `other` need to be
+	//!              normalized.
+	template <typename Tvalue>
+	constexpr auto operator!=(const Tvalue &other) const noexcept {
+		return *this != self_t(other);
+	}
 };
 } // namespace fas
 
