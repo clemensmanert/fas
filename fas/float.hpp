@@ -486,6 +486,73 @@ public:
 	self_t &operator+=(const Tvalue &summand) noexcept {
 		return (*this = *this + summand);
 	}
+	//! Returns the difference of `this` and the given subtrahend.
+	//!
+	//! @param subtrahend The operand to substract.
+	constexpr self_t operator-(const self_t &subtrahend) const noexcept {
+		if (*this == INF() && subtrahend == INF()) {
+			return NOT_A_NUMBER();
+		}
+
+		if (*this == NEGATIVE_INF() && subtrahend == NEGATIVE_INF()) {
+			return NOT_A_NUMBER();
+		}
+
+		if (*this == INF() || subtrahend == NEGATIVE_INF()) {
+			return INF();
+		}
+
+		if (*this == NEGATIVE_INF() || subtrahend == INF()) {
+			return NEGATIVE_INF();
+		}
+
+		if (subtrahend == ZERO()) {
+			return *this;
+		}
+
+		if (*this == ZERO()) {
+			return -subtrahend;
+		}
+
+		auto adjusted = adjust_mantissas(*this, subtrahend);
+
+		// Check for overflow/underflow.
+		if (_mantissa > 0 && subtrahend._mantissa > 0) {
+			// Shift mantissa and increase exponent in case of overflow.
+			if (MANTISSA_MAX - adjusted.first > adjusted.second) {
+				if (_exponent == EXPONENT_MAX || subtrahend._exponent == EXPONENT_MAX) {
+					return NEGATIVE_INF();
+				}
+				adjusted = adjust_mantissas(*this, subtrahend, 1);
+			}
+		} else if (_mantissa < 0 && subtrahend._mantissa > 0) {
+			// Shift mantissa and increase exponent in case of underflow.
+			if (adjusted.first < MANTISSA_LOWEST + adjusted.second) {
+				if (_exponent == EXPONENT_MAX || subtrahend._exponent == EXPONENT_MAX) {
+					return NEGATIVE_INF();
+				}
+				adjusted = adjust_mantissas(*this, subtrahend, 1);
+			}
+		}
+
+		return self_t(adjusted.first - adjusted.second, adjusted.exponent);
+	}
+
+	//! Returns the difference of `this` and the given subtrahend.
+	//!
+	//! @param subtrahend The operand to substract.
+	template <typename Tvalue>
+	constexpr self_t operator-(const Tvalue &subtrahend) const noexcept {
+		return *this - self_t(subtrahend);
+	}
+
+	//! Returns the difference of `this` and the given subtrahend.
+	//!
+	//! @param subtrahend The operand to substract.
+	template <typename Tvalue>
+	self_t &operator-=(const Tvalue &subtrahend) noexcept {
+		return (*this = *this - subtrahend);
+	}
 };
 } // namespace fas
 
