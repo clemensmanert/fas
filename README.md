@@ -1,3 +1,5 @@
+[![Build Status Ubuntu](https://github.com/clemensmanert/fas/actions/workflows/cmake-single-platform.yml/badge.svg)](https://github.com/clemensmanert/fas/actions)
+
 # fas - a floating point arithmetic in software
 *fas* is floating point arithmetic for arbitrary mantissa and exponent
 types in *modern header-only C++*.  It lets you construct various
