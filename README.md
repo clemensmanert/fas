@@ -82,7 +82,7 @@ constexpr c3 = c1 + c2; // => 3
 ### *iostream* support
 *fas* offers an output stream overload, which can be used for `std::cout`:
 ```C++
-#include "fas/stream.hpp>
+#include "fas/stream.hpp"
 
 ...
 
