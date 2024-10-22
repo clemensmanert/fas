@@ -1,4 +1,4 @@
-// Copyright 2018 Clemens Manert
+// Author: Clemens Manert
 #ifndef FLOATING_POINT_HPP
 #define FLOATING_POINT_HPP
 
