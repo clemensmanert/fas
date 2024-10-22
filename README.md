@@ -106,7 +106,7 @@ for(auto i=0; i<7; ++i) {
 }
 
 std::cout << std::setprecision(20);
-std::cout << fas_float << "\n";    // => exaclty 1
+std::cout << fas_float << "\n";    // => exactly 1
 std::cout << cpp_float << "\n";    // => 0.99999999999999977796
 ```
 The setting of different bases allows to represent specific fractions exaclty.
